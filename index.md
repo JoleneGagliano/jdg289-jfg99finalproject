@@ -1,5 +1,5 @@
 ---
-layout: home
 ---
 
+# DJ Set
 Welcome to my website!
