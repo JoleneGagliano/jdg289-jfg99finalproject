@@ -118,7 +118,7 @@ The pcb was placed in the enclosure and the lid was placed over it. Knobs were t
 *Mix 1: Starships X One More Time*
 
 <audio controls preload="none">
-  <source src="Cornell University 12.m4a" type="audio/mpeg">
+  <source src="CornellUniversity12.m4a" type="audio/mpeg">
   Your browser does not support the audio element.
 </audio>
 
@@ -153,15 +153,15 @@ The project successfully met its goals by implementing a stable, real-time embed
 
 The design conforms to applicable standards by using a custom PCB instead of a breadboard, improving reliability and professionalism. The addition of an enclosure further enhances safety and usability.
 
-##Appendix A
+## Appendix A
 The group approves this report for inclusion on the course website.
 The group approves the video for inclusion on the course youtube channel.
 
-##Appendix B
+## Appendix B
 
-###Appendix with a list of the specific tasks in the project carried out by each team member.
+### Appendix with a list of the specific tasks in the project carried out by each team member.
 
-###Links to datasheets
+### Links to datasheets
 
-###Code
+### Code
 
