@@ -28,6 +28,8 @@ The mathematical foundation of the project includes linear gain scaling, first-o
 
 This project uses both hardware and software filtering to balance signal integrity and flexibility. Our implementation of a hardware filter includes a voltage biasing dc blocking filter that cleans up the input audio to only contain a clean ac input from the 3.5mm audio jack, while biasing our waveform around 1.65V as to keep our ADC inputs within 0-3.3V.
 
+<img width="955" height="372" alt="Screenshot 2025-12-19 at 7 44 49 PM" src="https://github.com/user-attachments/assets/f60713c5-7663-41fe-b330-da7c0283700f" />
+
 Our software filters allow for adjustability and control over the effects we want to impose on our sampled audio. Though the inputs are analog, we get full control over how we interpret those values of 0-3.3V, to drive our digital low-pass and high-pass filters.
 
 ```c
@@ -40,6 +42,8 @@ y_a = y_a + alpha_l * (x - y_a);
 ```
 
 Initially, the project envisioned streaming audio from a computer over the RP2040’s USB interface, eliminating the need for discrete analog audio inputs. This idea was reflected in the original PCB design, which does not directly connect 3.5 mm audio jacks to the RP2040’s ADC pins. However, it quickly became clear that implementing real-time USB audio streaming would be significantly more complex and time-consuming than building the inputs out in hardware, which we did using a protoboard that connected to the broken-out ADC inputs.
+
+<img width="986" height="472" alt="Screenshot 2025-12-19 at 7 45 27 PM" src="https://github.com/user-attachments/assets/844c2762-d327-435f-b462-343ac22ba728" />
 
 ## Intellectual property considerations
 
