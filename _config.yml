@@ -1,7 +1,8 @@
-remote_theme: pages-themes/hacker@v0.2.0
+title: DJ Mixing Board Final Project
+description: By Jacob Gonzalez and Jolene Gagliano
+
+remote_theme: cotes2020/jekyll-theme-chirpy
 
 plugins:
   - jekyll-remote-theme
 
-title: DJ Mixing Board Final Project
-description: By Jacob Gonzalez and Jolene Gagliano
