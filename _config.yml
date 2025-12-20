@@ -1,9 +1,9 @@
 title: DJ Mixing Board Final Project
-description: Real-time audio mixing board on RP2040
+description: By Jacob Gonzalez and Jolene Gagliano
 
 remote_theme: "mmistakes/minimal-mistakes"
+minimal_mistakes_skin: "dark"
 
 plugins:
   - jekyll-remote-theme
-
-minimal_mistakes_skin: "dark"
+  - jekyll-include-cache
