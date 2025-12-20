@@ -22,11 +22,11 @@ The system processes two independent audio channels using the RP2040’s ADC inp
 At each interrupt of the high-speed repeating timer, the system reads the current ADC values, applies gain and filtering operations, optionally overrides the signal with stored audio samples, and writes the processed value to the DAC. As we are using monoaudio, each interrupt outputs a value to both the left and right speakers. The interrupt toggles which song it is outputting for the interrupt, resulting in the mixing of the two audio streams. A second timer runs at a much lower rate to update potentiometer values over I²C, decoupling slow control updates from the high-speed audio path. 
 
 
-## background math
+## Background Math
 
 The mathematical foundation of the project includes linear gain scaling, first-order low-pass filtering, and amplitude limiting to approximate aggressive high-pass behavior. The low-pass filters are implemented using the standard recursive form y[n] = y[n−1] + a(x[n] − y[n−1]) where the coefficient a is dynamically adjusted using a potentiometer input. 
 
-## hardware/software tradeoffs
+## Hardware/Software Tradeoffs
 
 This project uses both hardware and software filtering to balance signal integrity and flexibility. Our implementation of a hardware filter includes a voltage biasing dc blocking filter that cleans up the input audio to only contain a clean ac input from the 3.5mm audio jack, while biasing our waveform around 1.65V as to keep our ADC inputs within 0-3.3V.
 
@@ -57,8 +57,9 @@ Initially, the project envisioned streaming audio from a computer over the RP204
 The project does not infringe on existing patents, trademarks, or copyrighted designs. Audio samples used during testing were sourced from open platforms and were used strictly for educational purposes. No monetization is involved, and the use of audio content falls under fair use guidelines for academic and non-commercial projects.
 
 ## Program/hardware design
+At a high level, audio flows continuously from the analog inputs to a voltage bias filter, through ADC sampling and digital processing, to the DAC output, forming the core data path of the system. For the digital processing, user inputs and configuration updates are handled in parallel by slower control logic that adjusts parameters without interrupting audio playback. This organization allows the system to remain responsive and interactive while preserving consistent audio performance.
 
-###Software
+### Software
 The software architecture is structured around two repeating timers. The primary timer runs at approximately 45 kHz and executes the sample_and_output_cb function, which performs all real-time audio processing. This sampling rate was chosen based on the Nyquist sampling theorem, which states that a signal must be sampled at least twice its highest frequency component to avoid aliasing. Since human hearing extends up to approximately 20 kHz, a sampling rate above 40 kHz ensures accurate reconstruction of the audible spectrum. 
 
 Within each interrupt, the function reads both ADC channels, applies gain scaling and filtering, manages playback triggers, and writes the resulting value to the DAC. Gain is applied as a linear scaling factor derived from the potentiometer input, while low-pass filtering is implemented using a first-order low-pass filter. The filter coefficient alpha is dynamically adjusted based on a potentiometer value, giving the user real-time control over the effective cutoff frequency.
@@ -89,7 +90,7 @@ lp_a = (float)pot_val_lp_a / 255.0f;
 
 The filters, particularly the highpass, were the most challenging aspect to implement correctly without complete audio loss. We also initially struggled with timing, as if we attempted to do too much logic in the read and write timer, then we would not meet timing requirements for the DAC resulting in no sound playing. This is when we introduced a slower timer to handle the readings of the potentiometers. 
 
-###Hardware
+### Hardware
 The hardware consists of an RP2040 microcontroller, two analog audio inputs, an external ADS7830 ADC for potentiometer readings, and a dual-channel SPI DAC for audio output. GPIO pins are clearly defined for SPI, I²C, ADC, and digital input, and the code documents all pin assignments and communication protocols. A custom PCB designed in Altium was used for the main system, while the analog filters and audio jacks were implemented on a protoboard. 
 
 The pcb was placed in the enclosure and the lid was placed over it. Knobs were then placed on the potentiometers for better grip. One computer was connected to the RP2040 and the debugger from which the board was powered and flashed. The two audio inputs were then connected to computers which independently stream songs into. The audio output was then connected to the speaker. An oscilloscope was also connected to the ground pin on the protoboard, as this helped reduce noise on the sounds caused by the isolated computer grounds being different than the speaker ground.
