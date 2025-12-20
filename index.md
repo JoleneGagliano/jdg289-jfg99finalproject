@@ -5,9 +5,7 @@ title: DJ Mixing Board Final Project
 # DJ Mixing Board Final Project
 
 ## Project Introduction
-
-**One-sentence sound bite:**  
-A real-time embedded DJ mixing board that allows a user to mix two audio sources with adjustable volume and filtering using physical controls.
+Idea: A real-time embedded DJ mixing board that allows a user to mix two audio sources with adjustable volume and filtering using physical controls.
 
 **Summary (what we did and why):**  
 This project implements a real-time embedded DJ mixing board on the RP2040 microcontroller that mixes two audio channels with user-controlled gain and filtering while also supporting triggered playback of stored audio samples. The system processes audio in real time using ADC inputs, digital filtering, and DAC output, demonstrating core embedded systems concepts including concurrency, interrupt-driven timing, and hardware–software integration.
