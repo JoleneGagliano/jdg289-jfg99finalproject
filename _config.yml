@@ -1,4 +1,9 @@
-theme: jekyll-theme-hacker
-title: DJ Set
-description: By Jacob Gonzalez and Jolene Gagliano
+title: DJ Mixing Board Final Project
+description: Real-time audio mixing board on RP2040
 
+remote_theme: "mmistakes/minimal-mistakes"
+
+plugins:
+  - jekyll-remote-theme
+
+minimal_mistakes_skin: "dark"
