@@ -1,9 +1,7 @@
 ---
 title: DJ Mixing Board Final Project
-layout: single
+layout: simple
 ---
-
-# DJ Mixing Board – Final Project
 
 ## Project Introduction
 
