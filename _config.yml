@@ -1,7 +1,7 @@
-title: DJ Mixing Board Final Project
+title: DJ Mixing Board Final Project: By Jacob Gonzalez and Jolene Gagliano
 description: By Jacob Gonzalez and Jolene Gagliano
 
-remote_theme: "mmistakes/minimal-mistakes"
+remote_theme: qwtel/hydejack
 minimal_mistakes_skin: "dark"
 
 plugins:
