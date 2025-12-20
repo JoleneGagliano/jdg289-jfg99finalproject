@@ -90,13 +90,33 @@ The hardware consists of an RP2040 microcontroller, two analog audio inputs, an 
 The pcb was placed in the enclosure and the lid was placed over it. Knobs were then placed on the potentiometers for better grip. One computer was connected to the RP2040 and the debugger from which the board was powered and flashed. The two audio inputs were then connected to computers which independently stream songs into. The audio output was then connected to the speaker. An oscilloscope was also connected to the ground pin on the protoboard, as this helped reduce noise on the sounds.
 
 <img width="1200" height="847" alt="Screenshot 2025-12-19 at 7 59 55 PM" src="https://github.com/user-attachments/assets/40adf742-a9fc-491d-9367-c9d235c94af3" />
+
 *Figure 3: Custom PCB and Protoboard Schematic*
 
 <img width="608" height="387" alt="Screenshot 2025-12-19 at 8 04 27 PM" src="https://github.com/user-attachments/assets/b8ee368a-e1f2-4f15-8f74-5ca3c67940ee" />
+
 *Figure 4: Custom PCB
 
 <img width="681" height="368" alt="Screenshot 2025-12-19 at 8 05 02 PM" src="https://github.com/user-attachments/assets/958d3604-203c-4bf4-8377-29806b77ed12" />
+
 *Figure 5:Integrated DJ Mixing Board*
+
+<h3>Audio Demo</h3>
+<audio controls preload="none">
+  <source src="StarshipsXOneMoreTime.m4a" type="audio/mpeg">
+  Your browser does not support the audio element.
+</audio>
+
+*Mix 1: Starships X One More Time*
+
+<h3>Audio Demo</h3>
+<audio controls preload="none">
+  <source src="Cornell University.m4a" type="audio/mpeg">
+  Your browser does not support the audio element.
+</audio>
+
+*Mix 2: Starships X One More Time*
+
 
 Several features were considered but ultimately not implemented, including advanced playback control, reverb effects, and BPM adjustment. These features would require significantly more memory than is available on the RP2040, as well as the addition of external memory hardware. Given time and hardware constraints, these ideas were deferred in favor of ensuring stable real-time audio performance.
 
