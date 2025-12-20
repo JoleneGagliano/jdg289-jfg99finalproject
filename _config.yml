@@ -1,7 +1,7 @@
 title: DJ Mixing Board Final Project
 description: By Jacob Gonzalez and Jolene Gagliano
 
-remote_theme: cotes2020/jekyll-theme-chirpy
+remote_theme: pages-themes/midnight@v0.2.0
 
 plugins:
   - jekyll-remote-theme
