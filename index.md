@@ -107,7 +107,7 @@ The pcb was placed in the enclosure and the lid was placed over it. Knobs were t
 
 <img width="600" alt="Screenshot 2025-12-19 at 8 24 59 PM" src="https://github.com/user-attachments/assets/fa283917-82e2-4997-8910-0a33c5831710" />
 
-*Figure 6: Full DJ Setup
+*Figure 6: Full DJ Setup*
 
 
 <audio controls preload="none">
@@ -152,3 +152,16 @@ The system is intuitive and easy to use. Multiple users were able to interact wi
 The project successfully met its goals by implementing a stable, real-time embedded DJ mixing board with interactive physical controls and high-quality audio output. The system performed as expected under real-time constraints and demonstrated effective hardware/software integration. In future iterations, adding external memory would enable advanced features such as BPM adjustment, pitch shifting, reverb, echo, and playback control, bringing the system closer to a commercial DJ controller.
 
 The design conforms to applicable standards by using a custom PCB instead of a breadboard, improving reliability and professionalism. The addition of an enclosure further enhances safety and usability.
+
+##Appendix A
+The group approves this report for inclusion on the course website.
+The group approves the video for inclusion on the course youtube channel.
+
+##Appendix B
+
+###Appendix with a list of the specific tasks in the project carried out by each team member.
+
+###Links to datasheets
+
+###Code
+
