@@ -28,7 +28,7 @@ The mathematical foundation of the project includes linear gain scaling, first-o
 
 This project uses both hardware and software filtering to balance signal integrity and flexibility. Our implementation of a hardware filter includes a voltage biasing dc blocking filter that cleans up the input audio to only contain a clean ac input from the 3.5mm audio jack, while biasing our waveform around 1.65V as to keep our ADC inputs within 0-3.3V.
 
-<img width="955" height="372" alt="Screenshot 2025-12-19 at 7 44 49 PM" src="https://github.com/user-attachments/assets/f60713c5-7663-41fe-b330-da7c0283700f" />
+<img width="841" height="294" alt="Screenshot 2025-12-19 at 7 56 26 PM" src="https://github.com/user-attachments/assets/0abe601d-4c20-4f68-842c-6aae6481cf13" />
 *Figure 1: Protoboard Schematic*
 
 Our software filters allow for adjustability and control over the effects we want to impose on our sampled audio. Though the inputs are analog, we get full control over how we interpret those values of 0-3.3V, to drive our digital low-pass and high-pass filters.
@@ -41,6 +41,7 @@ float alpha_l = 0.02f + lp_a * 0.4f;  //low pass
 float x = (float)raw0;
 y_a = y_a + alpha_l * (x - y_a);
 ```
+*Applying scaling and filters to output*
 
 Initially, the project envisioned streaming audio from a computer over the RP2040’s USB interface, eliminating the need for discrete analog audio inputs. This idea was reflected in the original PCB design, which does not directly connect 3.5 mm audio jacks to the RP2040’s ADC pins. However, it quickly became clear that implementing real-time USB audio streaming would be significantly more complex and time-consuming than building the inputs out in hardware, which we did using a protoboard that connected to the broken-out ADC inputs.
 
@@ -62,8 +63,7 @@ float alpha = 0.02f + lp_a * 0.4f;
 y_a = y_a + alpha * (x - y_a);
 float out = y_a * level_a;
 ```
-
-Low pass filter.
+*Low pass filter*
 
 Our high-pass filter functions as a frequency cutoff by not playing certain frequencies based on a potentiometer value. This resulted in a cool audio effect that we chose to keep.
 
@@ -80,7 +80,7 @@ i2c_read_blocking(I2C_CHAN, ADDRESS, &pot_val_lp_a, 1, false);
 lp_a = (float)pot_val_lp_a / 255.0f;
 ```
 
-Example pot reading.
+*Example pot reading*
 
 The filters, particularly the high-pass behavior, were the most challenging aspect to implement correctly without complete audio loss. We also initially struggled with timing, as if we attempted to do too much logic in the read and write timer, then the we would not meet timing requirements for the DAC resulting in no sound playing. This is when we introduced a slower timer to handle the readings of the potentiometers.
 
@@ -89,12 +89,26 @@ The hardware consists of an RP2040 microcontroller, two analog audio inputs, an 
 
 The pcb was placed in the enclosure and the lid was placed over it. Knobs were then placed on the potentiometers for better grip. One computer was connected to the RP2040 and the debugger from which the board was powered and flashed. The two audio inputs were then connected to computers which independently stream songs into. The audio output was then connected to the speaker. An oscilloscope was also connected to the ground pin on the protoboard, as this helped reduce noise on the sounds.
 
+<img width="1200" height="847" alt="Screenshot 2025-12-19 at 7 59 55 PM" src="https://github.com/user-attachments/assets/40adf742-a9fc-491d-9367-c9d235c94af3" />
+*Figure 3: Custom PCB and Protoboard Schematic*
+
+<img width="608" height="387" alt="Screenshot 2025-12-19 at 8 04 27 PM" src="https://github.com/user-attachments/assets/b8ee368a-e1f2-4f15-8f74-5ca3c67940ee" />
+*Figure 4: Custom PCB
+
+<img width="681" height="368" alt="Screenshot 2025-12-19 at 8 05 02 PM" src="https://github.com/user-attachments/assets/958d3604-203c-4bf4-8377-29806b77ed12" />
+*Figure 5:Integrated DJ Mixing Board*
 
 Several features were considered but ultimately not implemented, including advanced playback control, reverb effects, and BPM adjustment. These features would require significantly more memory than is available on the RP2040, as well as the addition of external memory hardware. Given time and hardware constraints, these ideas were deferred in favor of ensuring stable real-time audio performance.
 
 AI tools were used selectively to assist with debugging and troubleshooting during development. Lines in code generated in AI are commented with “ // AI Help “.
 
 ## Results of the design
+
+<img width="762" height="424" alt="Screenshot 2025-12-19 at 8 00 58 PM" src="https://github.com/user-attachments/assets/81d3c4a9-0a48-4979-9e54-8f3eefca2557" />
+*Figure 6:Pre-1.65V Bias Audio Input*
+
+<img width="775" height="405" alt="Screenshot 2025-12-19 at 8 02 07 PM" src="https://github.com/user-attachments/assets/b46f080d-25e0-4fc9-a9dd-1e324bb5f479" />
+*Figure 7: Post-1.65V Bias Audio Input*
 
 The system executes fast enough to meet all real-time constraints. No audible hesitation, flicker, or dropouts were observed during operation. Alternating SPI writes between DAC channels proved sufficient to maintain consistent output timing and audio quality.
 
