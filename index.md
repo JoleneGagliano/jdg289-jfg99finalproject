@@ -105,6 +105,10 @@ The pcb was placed in the enclosure and the lid was placed over it. Knobs were t
 
 *Figure 5:Integrated DJ Mixing Board*
 
+<img width="600" alt="Screenshot 2025-12-19 at 8 24 59 PM" src="https://github.com/user-attachments/assets/fa283917-82e2-4997-8910-0a33c5831710" />
+
+*Figure 6: Full DJ Setup
+
 
 <audio controls preload="none">
   <source src="StarshipsXOneMoreTime.m4a" type="audio/mpeg">
@@ -118,7 +122,7 @@ The pcb was placed in the enclosure and the lid was placed over it. Knobs were t
   Your browser does not support the audio element.
 </audio>
 
-*Mix 2: Starships X One More Time*
+*Mix 2: Blow x Big Time Rush*
 
 
 Several features were considered but ultimately not implemented, including advanced playback control, reverb effects, and BPM adjustment. These features would require significantly more memory than is available on the RP2040, as well as the addition of external memory hardware. Given time and hardware constraints, these ideas were deferred in favor of ensuring stable real-time audio performance.
