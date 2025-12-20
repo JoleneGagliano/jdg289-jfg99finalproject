@@ -1,6 +1,6 @@
 ---
 title: DJ Mixing Board Final Project
-layout: default
+layout: page
 ---
 
 ## Project Introduction
