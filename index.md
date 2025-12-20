@@ -171,4 +171,300 @@ MCP4822-E/SN - https://ww1.microchip.com/downloads/aemDocuments/documents/OTH/Pr
 <img width="600" alt="Screenshot 2025-12-19 at 7 59 55 PM" src="https://github.com/user-attachments/assets/40adf742-a9fc-491d-9367-c9d235c94af3" />
 
 ### Code
+```c
+**
+ * Audio-through x2: 
+ *   ADC0 (GPIO26)  
+ *   ADC2 (GPIO28)  
+ */
+
+#include "vga16_graphics_v2.h"
+
+#include <stdio.h>
+#include <stdlib.h>
+#include <math.h>
+#include <string.h>
+
+#include "hardware/dma.h"
+#include "hardware/spi.h"
+
+#include "pico/stdlib.h"
+#include "pico/divider.h"
+#include "pico/multicore.h"
+
+#include "hardware/pio.h"
+#include "hardware/clocks.h"
+#include "hardware/adc.h"
+#include "hardware/pll.h"
+
+#include "pt_cornell_rp2040_v1_4.h"
+#include "hardware/i2c.h"
+
+#include "audio_data_40k.h"   // the header for DJ Tag
+#include "audio_data_40k_9.h"   // new sound
+
+
+// DJ Tag variables
+volatile uint32_t audio_idx = 0;
+volatile bool audio_playing = false;
+volatile bool last_gp2_state = false;   // check for press
+
+//hunter name drop variables
+volatile uint32_t audio_idx_b = 0;
+volatile bool audio_playing_b = false;
+volatile bool last_gp3_state = false;   // check for press
+
+// --- Pin and timing definitions ---
+#define ADC0_GPIO        26      // GPIO26 = ADC0
+#define ADC2_GPIO        28      // GPIO28 = ADC2
+
+#define SAMPLE_RATE_HZ   45000   // timer callbacks per second
+
+
+// SPI data
+uint16_t DAC_data_1; // output value
+uint16_t DAC_data_0; // output value
+
+//values for DAC
+int DAC_output_0 ;
+int DAC_output_1 ;
+
+
+// A-channel, 1x, active
+#define DAC_config_chan_A 0b0011000000000000
+
+// B-channel, 1x, active
+#define DAC_config_chan_B 0b1011000000000000
+
+// SPI configurations (note these represent GPIO number, NOT pin number)
+#define PIN_CS 5
+#define PIN_SCK 6
+#define PIN_MOSI 7
+#define SPI_PORT spi0
+
+#define I2C_CHAN i2c1
+#define I2C_BAUD_RATE 400000
+#define ADDRESS 0x48
+
+
+// alarm infrastructure 
+#define ALARM_NUM 0
+#define ALARM_IRQ TIMER_IRQ_0
+ 
+//potentiometer stuff
+float level_a;
+float level_b;
+float lp_a = 0.5f;      // 0..1 from the low-pass pot (R1)
+float lp_b = 0.5f;      // 0..1 from the low-pass pot (R4)
+float hp_a = 1.0f;      // high-pass pot (R2)
+float hp_b = 1.0f;      // high-pass pot (R5)
+static float y_a = 0.0f; // filter state for channel A
+static float y_b = 0.0f; // filter state for channel B
+
+static repeating_timer_t sample_timer;
+static uint slice0, slice1;
+
+bool read_pot_cb(repeating_timer_t *rt) {
+
+    uint8_t cmd_a = 0x8C;  // ADS7830 command for channel 0 (G_A)
+    uint8_t pot_val_a = 0;
+    static bool toggleab = false;
+
+// ---------------------------------------A stuff ---------------------------------------------
+ 
+    if (i2c_write_blocking(I2C_CHAN, ADDRESS, &cmd_a, 1, true) < 0)
+        return true;
+    i2c_read_blocking(I2C_CHAN, ADDRESS, &pot_val_a, 1, false);
+    level_a = (float)pot_val_a / 255.0f; //a gain
+
+    
+    uint8_t cmd_lp_a = 0xCC;  // ADS7830 command for channel 1 (LP_A)
+    uint8_t pot_val_lp_a = 0;
+    const float alpha_a = 0.1f;
+
+    if (i2c_write_blocking(I2C_CHAN, ADDRESS, &cmd_lp_a, 1, true) < 0)
+        return true;
+    i2c_read_blocking(I2C_CHAN, ADDRESS, &pot_val_lp_a, 1, false);
+    lp_a = (float)pot_val_lp_a / 255.0f;
+
+    uint8_t cmd_hp_a = 0x9C;   // CH2 (high pass A)
+    uint8_t pot_val_hp_a = 0;
+    if (i2c_write_blocking(I2C_CHAN, ADDRESS, &cmd_hp_a, 1, true) < 0)
+        return true;
+    i2c_read_blocking(I2C_CHAN, ADDRESS, &pot_val_hp_a, 1, false);
+    hp_a = (float)pot_val_hp_a / 255.0f;
+
+   
+
+// --------------------------------------- B stuff ---------------------------------------------
+    
+    uint8_t cmd_b = 0xFC;  // ADS7830 command for channel 7 (G_B)
+    uint8_t pot_val_b = 0;
+    if (i2c_write_blocking(I2C_CHAN, ADDRESS, &cmd_b, 1, true) < 0)
+        return true;
+    i2c_read_blocking(I2C_CHAN, ADDRESS, &pot_val_b, 1, false);
+    level_b = (float)pot_val_b / 255.0f; // b gain
+
+    
+    uint8_t cmd_lp_b = 0xAC;  // ADS7830 command for channel 4 (LP_B)
+    uint8_t pot_val_lp_b = 0;
+    const float alpha_b = 0.1f;
+
+    if (i2c_write_blocking(I2C_CHAN, ADDRESS, &cmd_lp_b, 1, true) < 0)
+        return true;
+    i2c_read_blocking(I2C_CHAN, ADDRESS, &pot_val_lp_b, 1, false);
+    lp_b = (float)pot_val_lp_b / 255.0f;
+    
+    uint8_t cmd_hp_b = 0xEC;   // CH5 (high pass B)
+    uint8_t pot_val_hp_b = 0;
+    if (i2c_write_blocking(I2C_CHAN, ADDRESS, &cmd_hp_b, 1, true) < 0)
+        return true;
+    i2c_read_blocking(I2C_CHAN, ADDRESS, &pot_val_hp_b, 1, false);
+    hp_b = (float)pot_val_hp_b / 255.0f;
+
+
+    return true;
+}
+
+
+bool sample_and_output_cb(repeating_timer_t *rt) {
+
+    //clearing alarm
+    hw_clear_bits(&timer_hw->intr, 1u << ALARM_NUM); 
+
+    // GP2 triggering stuff
+    const uint PLAY_PIN = 2;
+    bool gp2_now = gpio_get(PLAY_PIN);
+
+    // checks for rising edge (lets us spam button without restarting sound)
+    if (gp2_now && !last_gp2_state) {
+        audio_idx = 0;
+        audio_playing = true;
+    }
+
+    // stops playback
+    if (!gp2_now) {
+        audio_playing = false;
+    }
+
+    last_gp2_state = gp2_now;
+
+    //SONG A CODE
+
+    
+    adc_select_input(0);               // select ADC0 (GPIO26)
+    uint16_t raw0 = adc_read();        
+    DAC_output_0 = (uint16_t)(raw0 * level_a); // scale by level_a
+    
+    float alpha_l = 0.02f + lp_a * 0.4f;  //low pass
+    float x = (float)raw0;
+    y_a = y_a + alpha_l * (x - y_a);
+
+ 
+    
+    //high pass
+ 
+    //gain
+    float out = y_a * level_a;
+
+    
+    float cutoff = 4095.0f * hp_a;
+
+    if (out < 0) out = 0;
+    //if (out > 4095.0f) out = 4095.0f;
+    if (out > cutoff) out = cutoff;
+
+    DAC_output_0 = (uint16_t)out;
+
+    // override output for button press
+    if (audio_playing && gp2_now) {
+        if (audio_idx < AUDIO_DATA_LEN) {
+            DAC_output_0 = audio_data[audio_idx] & 0x0FFF; 
+            audio_idx++;
+        } else {
+            // stops at end 
+            audio_playing = false;
+        }
+    }
+
+    DAC_data_0 = (DAC_config_chan_A | (DAC_output_0 & 0xffff));
+
+    //song b code
+    adc_select_input(2);               // select ADC2 (GPIO28)
+    uint16_t raw1 = adc_read();
+    DAC_output_1 = (uint16_t)(raw1 * level_b); // scale by level_b
+
+    float alpha_b = 0.02f + lp_b * 0.4f;  //low pass
+    float x_b = (float)raw1;
+    y_b = y_b + alpha_b * (x_b - y_b);
+    float out_b = y_b * level_b;
+    
+    //high pass
+
+
+
+    float cutoff_b = 4095.0f * hp_b;
+
+    if (out_b < 0) out_b = 0;
+    //if (out_b > cutoff) out_b = cutoff;
+    if (out_b > cutoff_b) out_b = cutoff_b;
+    
+    DAC_output_1 = (uint16_t)out_b;
+
+    DAC_data_1 = (DAC_config_chan_B | (DAC_output_1 & 0xffff));
+
+    static bool toggle = false;
+
+    if (toggle) {
+
+        spi_write16_blocking(SPI_PORT, &DAC_data_0, 1);
+    }
+     else {
+        spi_write16_blocking(SPI_PORT, &DAC_data_1, 1);
+     }
+
+    toggle = !toggle;   // flip it for next time
+
+    return true;
+}
+
+
+int main() {
+    stdio_init_all();
+    spi_init(SPI_PORT, 200000000) ;
+    spi_set_format(SPI_PORT, 16, 0, 0, 0);
+
+    gpio_set_function(PIN_SCK, GPIO_FUNC_SPI);
+    gpio_set_function(PIN_MOSI, GPIO_FUNC_SPI);
+    gpio_set_function(PIN_CS, GPIO_FUNC_SPI) ;
+    
+    i2c_init(I2C_CHAN, I2C_BAUD_RATE);
+    gpio_set_function(14, GPIO_FUNC_I2C);
+    gpio_set_function(15, GPIO_FUNC_I2C);
+
+    adc_init();
+    adc_gpio_init(ADC0_GPIO);      // prepare pin for ADC0
+    adc_gpio_init(ADC2_GPIO);      // prepare pin for ADC2
+
+    //setting rate for ADC
+    adc_set_clkdiv(2399.0f);
+
+    //--AI--HELP for better timing of read
+    int us = -(1000000 / SAMPLE_RATE_HZ);
+    add_repeating_timer_us(us, sample_and_output_cb, NULL, &sample_timer);
+    // reading for potentiometer
+    static repeating_timer_t pot_timer;
+    add_repeating_timer_ms(10, read_pot_cb, NULL, &pot_timer);
+
+    const uint PLAY_PIN = 2;
+    gpio_init(PLAY_PIN);
+    gpio_set_dir(PLAY_PIN, GPIO_IN);
+    gpio_pull_down(PLAY_PIN);   // keeps it low if floating
+
+
+    while (true) {
+        tight_loop_contents(); // all work done in interrupt
+    }
+}
+```
 
