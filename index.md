@@ -45,7 +45,7 @@ y_a = y_a + alpha_l * (x - y_a);
 
 Initially, the project envisioned streaming audio from a computer over the RP2040’s USB interface, eliminating the need for discrete analog audio inputs. This idea was reflected in the original PCB design, which does not directly connect 3.5 mm audio jacks to the RP2040’s ADC pins. However, it quickly became clear that implementing real-time USB audio streaming would be significantly more complex and time-consuming than building the inputs out in hardware, which we did using a protoboard that connected to the broken-out ADC inputs.
 
-<img width="986" height="472" alt="Screenshot 2025-12-19 at 7 45 27 PM" src="https://github.com/user-attachments/assets/844c2762-d327-435f-b462-343ac22ba728" />
+<img width="600" alt="Screenshot 2025-12-19 at 7 45 27 PM" src="https://github.com/user-attachments/assets/844c2762-d327-435f-b462-343ac22ba728" />
 *Figure 2: Protoboard*
 
 ## Intellectual property considerations
@@ -89,19 +89,21 @@ The hardware consists of an RP2040 microcontroller, two analog audio inputs, an 
 
 The pcb was placed in the enclosure and the lid was placed over it. Knobs were then placed on the potentiometers for better grip. One computer was connected to the RP2040 and the debugger from which the board was powered and flashed. The two audio inputs were then connected to computers which independently stream songs into. The audio output was then connected to the speaker. An oscilloscope was also connected to the ground pin on the protoboard, as this helped reduce noise on the sounds.
 
-<img width="1200" height="847" alt="Screenshot 2025-12-19 at 7 59 55 PM" src="https://github.com/user-attachments/assets/40adf742-a9fc-491d-9367-c9d235c94af3" />
+<img width="600" alt="Screenshot 2025-12-19 at 7 59 55 PM" src="https://github.com/user-attachments/assets/40adf742-a9fc-491d-9367-c9d235c94af3" />
 
 *Figure 3: Custom PCB and Protoboard Schematic*
 
-<img width="608" height="387" alt="Screenshot 2025-12-19 at 8 04 27 PM" src="https://github.com/user-attachments/assets/b8ee368a-e1f2-4f15-8f74-5ca3c67940ee" />
 
-*Figure 4: Custom PCB
+<img width="600" alt="Screenshot 2025-12-19 at 8 04 27 PM" src="https://github.com/user-attachments/assets/b8ee368a-e1f2-4f15-8f74-5ca3c67940ee" />
 
-<img width="681" height="368" alt="Screenshot 2025-12-19 at 8 05 02 PM" src="https://github.com/user-attachments/assets/958d3604-203c-4bf4-8377-29806b77ed12" />
+*Figure 4: Custom PCB*
+
+
+<img width="600"  alt="Screenshot 2025-12-19 at 8 05 02 PM" src="https://github.com/user-attachments/assets/958d3604-203c-4bf4-8377-29806b77ed12" />
 
 *Figure 5:Integrated DJ Mixing Board*
 
-<h3>Audio Demo</h3>
+
 <audio controls preload="none">
   <source src="StarshipsXOneMoreTime.m4a" type="audio/mpeg">
   Your browser does not support the audio element.
@@ -109,7 +111,6 @@ The pcb was placed in the enclosure and the lid was placed over it. Knobs were t
 
 *Mix 1: Starships X One More Time*
 
-<h3>Audio Demo</h3>
 <audio controls preload="none">
   <source src="Cornell University.m4a" type="audio/mpeg">
   Your browser does not support the audio element.
@@ -124,10 +125,10 @@ AI tools were used selectively to assist with debugging and troubleshooting duri
 
 ## Results of the design
 
-<img width="762" height="424" alt="Screenshot 2025-12-19 at 8 00 58 PM" src="https://github.com/user-attachments/assets/81d3c4a9-0a48-4979-9e54-8f3eefca2557" />
+<img width="600" alt="Screenshot 2025-12-19 at 8 00 58 PM" src="https://github.com/user-attachments/assets/81d3c4a9-0a48-4979-9e54-8f3eefca2557" />
 *Figure 6:Pre-1.65V Bias Audio Input*
 
-<img width="775" height="405" alt="Screenshot 2025-12-19 at 8 02 07 PM" src="https://github.com/user-attachments/assets/b46f080d-25e0-4fc9-a9dd-1e324bb5f479" />
+<img width="600" alt="Screenshot 2025-12-19 at 8 02 07 PM" src="https://github.com/user-attachments/assets/b46f080d-25e0-4fc9-a9dd-1e324bb5f479" />
 *Figure 7: Post-1.65V Bias Audio Input*
 
 The system executes fast enough to meet all real-time constraints. No audible hesitation, flicker, or dropouts were observed during operation. Alternating SPI writes between DAC channels proved sufficient to maintain consistent output timing and audio quality.
