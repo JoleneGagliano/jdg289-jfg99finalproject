@@ -8,9 +8,9 @@ title: DJ Mixing Board Final Project
 
 This project is a real-time embedded DJ mixing board that allows a user to mix two audio sources with adjustable volume and filtering using physical controls.
  
-This project implements a real-time embedded DJ mixing board on the RP2040 microcontroller that mixes two audio channels with user-controlled gain, low-pass filtering, and high-pass behavior, while also supporting triggered playback of stored audio samples. The system processes audio in real time using ADC inputs, digital filtering, and DAC output, demonstrating core embedded systems concepts including concurrency, interrupt-driven timing, and hardware–software integration.
+ This project implements a real-time embedded DJ mixing board on the RP2040 microcontroller that mixes two audio channels with user-controlled gain, low-pass filtering, and high-pass behavior, while also supporting triggered playback of stored audio samples. The system processes audio in real time using ADC inputs, digital filtering, and DAC output, demonstrating core embedded systems concepts including concurrency, interrupt-driven timing, and hardware–software integration.
+ The primary goal of the project was to explore real-time audio signal processing in an embedded environment. Audio mixing was chosen because it is inherently timing-sensitive: even small deviations in sampling rate or processing latency immediately manifest as audible artifacts such as distortion, dropouts, or aliasing. By combining continuous analog inputs, digitally sampled control signals from potentiometers, and deterministic interrupt-based execution, this project provides a strong platform for studying real-time constraints, signal flow, and performance tradeoffs in embedded systems.
 
-The primary goal of the project was to explore real-time audio signal processing in an embedded environment. Audio mixing was chosen because it is inherently timing-sensitive: even small deviations in sampling rate or processing latency immediately manifest as audible artifacts such as distortion, dropouts, or aliasing. By combining continuous analog inputs, digitally sampled control signals from potentiometers, and deterministic interrupt-based execution, this project provides a strong platform for studying real-time constraints, signal flow, and performance tradeoffs in embedded systems.
 
 ## High level design
 
@@ -20,7 +20,7 @@ The system processes two independent audio channels using the RP2040’s ADC inp
 
 At each interrupt of the high-speed repeating timer, the system reads the current ADC values, applies gain and filtering operations, optionally overrides the signal with stored audio samples, and writes the processed value to the DAC. As we are using mono audio, each interrupt outputs a value to both the left and right speakers. The interrupt toggles which song it is outputting for the interrupt, resulting in the mixing of the two audio streams. A second timer runs at a much lower rate to update potentiometer values over I²C, decoupling slow control updates from the high-speed audio path.
 
-##backgroud math
+## background math
 
 The mathematical foundation of the project includes linear gain scaling, first-order low-pass filtering, and amplitude limiting to approximate aggressive high-pass behavior. The low-pass filters are implemented using the standard recursive form y[n] = y[n−1] + a(x[n] − y[n−1]) where the coefficient a is dynamically adjusted using a potentiometer input.
 
@@ -29,6 +29,7 @@ The mathematical foundation of the project includes linear gain scaling, first-o
 This project uses both hardware and software filtering to balance signal integrity and flexibility. Our implementation of a hardware filter includes a voltage biasing dc blocking filter that cleans up the input audio to only contain a clean ac input from the 3.5mm audio jack, while biasing our waveform around 1.65V as to keep our ADC inputs within 0-3.3V.
 
 <img width="955" height="372" alt="Screenshot 2025-12-19 at 7 44 49 PM" src="https://github.com/user-attachments/assets/f60713c5-7663-41fe-b330-da7c0283700f" />
+*Figure 1: Protoboard Schematic*
 
 Our software filters allow for adjustability and control over the effects we want to impose on our sampled audio. Though the inputs are analog, we get full control over how we interpret those values of 0-3.3V, to drive our digital low-pass and high-pass filters.
 
@@ -44,6 +45,7 @@ y_a = y_a + alpha_l * (x - y_a);
 Initially, the project envisioned streaming audio from a computer over the RP2040’s USB interface, eliminating the need for discrete analog audio inputs. This idea was reflected in the original PCB design, which does not directly connect 3.5 mm audio jacks to the RP2040’s ADC pins. However, it quickly became clear that implementing real-time USB audio streaming would be significantly more complex and time-consuming than building the inputs out in hardware, which we did using a protoboard that connected to the broken-out ADC inputs.
 
 <img width="986" height="472" alt="Screenshot 2025-12-19 at 7 45 27 PM" src="https://github.com/user-attachments/assets/844c2762-d327-435f-b462-343ac22ba728" />
+*Figure 2: Protoboard*
 
 ## Intellectual property considerations
 
